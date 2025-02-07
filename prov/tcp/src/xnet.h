@@ -754,4 +754,26 @@ int xnet_rdm_ops_open(struct fid *fid, const char *name,
 	FI_WARN(&xnet_prov, subsystem, log_str "%s (%d)\n", \
 		fi_strerror((int) -(err)), (int) err)
 
+#define XNET_OUTPUT_ERR_WARN(ep, err)		\
+do {						\
+	struct sockaddr *_addr;			\
+	struct sockaddr *_src_addr;		\
+	char _buf[48];				\
+	char _src_buf[48];			\
+	size_t _len = 48;			\
+	size_t _src_len = 48;			\
+						\
+	if (ep == NULL)				\
+		break;				\
+						\
+	_addr = &ep->srx->rdm->addr.sa;		\
+	_src_addr = &ep->peer->addr.sa;		\
+	ofi_straddr(_buf, &_len, ofi_translate_addr_format(ofi_sa_family(_addr)), _addr);	\
+	ofi_straddr(_src_buf, &_src_len, ofi_translate_addr_format(ofi_sa_family(_src_addr)),	\
+		    _src_addr);									\
+												\
+	FI_WARN(&xnet_prov, FI_LOG_EP_CTRL, "error on %s From %s : %s\n", _buf, _src_buf,	\
+		fi_strerror(err));								\
+} while(0)
+
 #endif //_XNET_H_

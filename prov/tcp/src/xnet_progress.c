@@ -165,6 +165,7 @@ static int xnet_handle_truncate(struct xnet_ep *ep)
 	/* TODO: need to report received message size =
 	 * base_hdr.size - base_hdr.hdr_size - data_left
 	 */
+	XNET_OUTPUT_ERR_WARN(ep, FI_ETRUNC);
 	xnet_report_error(rx_entry, FI_ETRUNC);
 
 	/* Prepare to remove excess msg data from stream to continue */
@@ -239,6 +240,7 @@ xnet_rts_matched(struct xnet_rdm *rdm, struct xnet_ep *ep,
 
 err_comp:
 	xnet_cntr_incerr(rx_entry);
+	XNET_OUTPUT_ERR_WARN(ep, -ret);
 	xnet_report_error(rx_entry, -ret);
 	xnet_free_xfer(xnet_rdm2_progress(rdm), rx_entry);
 	return ret;
@@ -522,6 +524,7 @@ static void xnet_complete_tx(struct xnet_ep *ep, int ret)
 	if (ret) {
 		FI_WARN(&xnet_prov, FI_LOG_DOMAIN, "msg send failed\n");
 		xnet_cntr_incerr(tx_entry);
+		XNET_OUTPUT_ERR_WARN(ep, -ret);
 		xnet_report_error(tx_entry, -ret);
 		xnet_free_xfer(xnet_ep2_progress(ep), tx_entry);
 	} else if (tx_entry->ctrl_flags & XNET_NEED_CTS) {
@@ -770,6 +773,7 @@ int xnet_start_recv(struct xnet_ep *ep, struct xnet_xfer_entry *rx_entry)
 
  poll_err:
 	xnet_cntr_incerr(rx_entry);
+	XNET_OUTPUT_ERR_WARN(ep, -ret);
 	xnet_report_error(rx_entry, -ret);
 	xnet_free_xfer(xnet_ep2_progress(ep), rx_entry);
 	return ret;
@@ -1115,6 +1119,7 @@ cq_error:
 	FI_WARN(&xnet_prov, FI_LOG_EP_DATA,
 		"msg recv failed ret = %zd (%s)\n", ret, fi_strerror((int)-ret));
 	xnet_cntr_incerr(rx_entry);
+	XNET_OUTPUT_ERR_WARN(ep, -ret);
 	xnet_report_error(rx_entry, (int) -ret);
 	xnet_free_xfer(xnet_ep2_progress(ep), rx_entry);
 	xnet_reset_rx(ep);
