@@ -821,6 +821,8 @@ int xnet_endpoint(struct fid_domain *domain, struct fi_info *info,
 	ep->cur_rx.hdr_len = sizeof(ep->cur_rx.hdr.base_hdr);
 	xnet_config_bsock(&ep->bsock);
 
+	ep->tagged_rpc = info->ep_attr->mem_tag_format == FI_TAG_RPC;
+
 	*ep_fid = &ep->util_ep.ep_fid;
 	(*ep_fid)->fid.ops = &xnet_ep_fi_ops;
 	(*ep_fid)->ops = &xnet_ep_ops;
