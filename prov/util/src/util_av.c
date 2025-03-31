@@ -270,7 +270,7 @@ int ofi_verify_av_insert(struct util_av *av, uint64_t flags, void *context)
 		}
 	}
 
-	if (flags & ~(FI_MORE | FI_SYNC_ERR)) {
+	if (flags & ~(FI_MORE | FI_SYNC_ERR | FI_FIREWALL_ADDR)) {
 		FI_WARN(av->prov, FI_LOG_AV, "unsupported flags\n");
 		return -FI_EBADFLAGS;
 	}
